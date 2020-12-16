@@ -4,13 +4,17 @@ static char *fulluseragent  = ""; /* Or override the whole user agent string */
 static char *scriptfile     = "~/.config/surf/script.js";
 static char *styledir       = "~/.config/surf/styles/";
 static char *certdir        = "~/.config/surf/certificates/";
-static char *cachedir       = "~/.config/surf/cache/";
-static char *cookiefile     = "~/.config/surf/cookies.txt";
+static char *cachedir       = "~/.cache/surf/cache";
+static char *cookiefile     = "~/.cache/surf/cookies.txt";
+static char *historyfile    = "~/.cache/surf/history";
 static char **plugindirs    = (char*[]){
-	"~/.surf/plugins/",
+	"~/.config/surf/plugins/",
 	LIBPREFIX "/mozilla/plugins/",
 	NULL
 };
+
+/* enable to open GO prompt on startup */
+static int startgo = 0;
 
 /* Webkit default features */
 /* Highest priority value will be used.
@@ -108,6 +112,11 @@ static WebKitFindOptions findopts = WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE |
         } \
 }
 
+#define SETURI(p)       { .v = (char *[]){ "/bin/sh", "-c", \
+"prop=\"`surf_history_dmenu.sh`\" &&" \
+"xprop -id $1 -f $0 8s -set $0 \"$prop\"", \
+p, winid, NULL } }
+
 /* styles */
 /*
  * The iteration will stop at the first match, beginning at the beginning of
@@ -186,6 +195,7 @@ static Key keys[] = {
 	{ MODKEY|GDK_SHIFT_MASK, GDK_KEY_b,      toggle,     { .i = ScrollBars } },
 	{ MODKEY|GDK_SHIFT_MASK, GDK_KEY_t,      toggle,     { .i = StrictTLS } },
 	{ MODKEY|GDK_SHIFT_MASK, GDK_KEY_m,      toggle,     { .i = Style } },
+    { MODKEY               , GDK_KEY_Return, spawn,      SETURI("_SURF_GO") },
 };
 
 /* button definitions */
@@ -199,3 +209,5 @@ static Button buttons[] = {
 	{ OnAny,        0,              9,      clicknavigate,  { .i = +1 },    1 },
 	{ OnMedia,      MODKEY,         1,      clickexternplayer, { 0 },       1 },
 };
+
+#define HOMEPAGE "https://duckduckgo.com/"

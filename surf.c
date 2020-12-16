@@ -179,6 +179,7 @@ static void spawn(Client *c, const Arg *a);
 static void msgext(Client *c, char type, const Arg *a);
 static void destroyclient(Client *c);
 static void cleanup(void);
+static void updatehistory(const char *u, const char *t);
 
 /* GTK/WebKit */
 static WebKitWebView *newview(Client *c, WebKitWebView *rv);
@@ -352,6 +353,7 @@ setup(void)
 
 	/* dirs and files */
 	cookiefile = buildfile(cookiefile);
+	historyfile = buildfile(historyfile);
 	scriptfile = buildfile(scriptfile);
 	certdir    = buildpath(certdir);
 	if (curconfig[Ephemeral].val.i)
@@ -1097,10 +1099,26 @@ cleanup(void)
 	close(spair[0]);
 	close(spair[1]);
 	g_free(cookiefile);
+	g_free(historyfile);
 	g_free(scriptfile);
 	g_free(stylefile);
 	g_free(cachedir);
 	XCloseDisplay(dpy);
+}
+
+void
+updatehistory(const char *u, const char *t)
+{
+	FILE *f;
+	f = fopen(historyfile, "a+");
+
+	char b[20];
+	time_t now = time (0);
+	strftime (b, 20, "%Y-%m-%d %H:%M:%S", localtime (&now));
+	fputs(b, f);
+
+	fprintf(f, " %s %s\n", u, t);
+	fclose(f);
 }
 
 WebKitWebView *
@@ -1518,6 +1536,7 @@ loadfailedtls(WebKitWebView *v, gchar *uri, GTlsCertificate *cert,
 	return TRUE;
 }
 
+
 void
 loadchanged(WebKitWebView *v, WebKitLoadEvent e, Client *c)
 {
@@ -1548,6 +1567,7 @@ loadchanged(WebKitWebView *v, WebKitLoadEvent e, Client *c)
 		break;
 	case WEBKIT_LOAD_FINISHED:
 		seturiparameters(c, uri, loadfinished);
+		updatehistory(uri, c->title);
 		/* Disabled until we write some WebKitWebExtension for
 		 * manipulating the DOM directly.
 		evalscript(c, "document.documentElement.style.overflow = '%s'",
@@ -2058,6 +2078,9 @@ main(int argc, char *argv[])
 		defconfig[Geolocation].val.i = 1;
 		defconfig[Geolocation].prio = 2;
 		break;
+	case 'h':
+		startgo = 1;
+		break;
 	case 'i':
 		defconfig[LoadImages].val.i = 0;
 		defconfig[LoadImages].prio = 2;
@@ -2143,7 +2166,11 @@ main(int argc, char *argv[])
 	if (argc > 0)
 		arg.v = argv[0];
 	else
+#ifdef HOMEPAGE
+		arg.v = HOMEPAGE;
+#else
 		arg.v = "about:blank";
+#endif
 
 	setup();
 	c = newclient(NULL);
@@ -2151,6 +2178,12 @@ main(int argc, char *argv[])
 
 	loaduri(c, &arg);
 	updatetitle(c);
+
+	if (startgo) {
+		/* start directly into GO prompt */
+		Arg a = (Arg)SETPROP("_SURF_URI", "_SURF_GO", PROMPT_GO);
+		spawn(c, &a);
+	}
 
 	gtk_main();
 	cleanup();
