@@ -13,6 +13,15 @@ static char **plugindirs    = (char*[]){
 	NULL
 };
 
+static SearchEngine searchengines[] = {
+	/* token,    uri */
+	{ "ddg",       "https://duckduckgo.com/?q=%s" },
+};
+
+static char *reservednames[] = {
+	"localhost",
+};
+
 /* enable to open GO prompt on startup */
 static int startgo = 0;
 
@@ -35,12 +44,12 @@ static Parameter defconfig[ParameterLast] = {
 	[DNSPrefetch]         =       { { .i = 0 },     },
 	[Ephemeral]           =       { { .i = 0 },     },
 	[FileURLsCrossAccess] =       { { .i = 0 },     },
-	[FontSize]            =       { { .i = 12 },    },
+	[FontSize]            =       { { .i = 15 },    },
 	[FrameFlattening]     =       { { .i = 0 },     },
 	[Geolocation]         =       { { .i = 0 },     },
-	[HideBackground]      =       { { .i = 0 },     },
+	[HideBackground]      =       { { .i = 1 },     },
 	[Inspector]           =       { { .i = 0 },     },
-	[Java]                =       { { .i = 1 },     },
+	[Java]                =       { { .i = 0 },     },
 	[JavaScript]          =       { { .i = 1 },     },
 	[KioskMode]           =       { { .i = 0 },     },
 	[LoadImages]          =       { { .i = 1 },     },
@@ -51,7 +60,7 @@ static Parameter defconfig[ParameterLast] = {
 	[ScrollBars]          =       { { .i = 1 },     },
 	[ShowIndicators]      =       { { .i = 1 },     },
 	[SiteQuirks]          =       { { .i = 1 },     },
-	[SmoothScrolling]     =       { { .i = 0 },     },
+	[SmoothScrolling]     =       { { .i = 1 },     },
 	[SpellChecking]       =       { { .i = 0 },     },
 	[SpellLanguages]      =       { { .v = ((char *[]){ "en_US", NULL }) }, },
 	[StrictTLS]           =       { { .i = 1 },     },
@@ -124,6 +133,7 @@ p, winid, NULL } }
  */
 static SiteSpecific styles[] = {
 	/* regexp               file in $styledir */
+	{ ".*suckless.org",     "suckless.css" },
 	{ ".*",                 "default.css" },
 };
 
