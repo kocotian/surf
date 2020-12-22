@@ -2216,7 +2216,7 @@ main(int argc, char *argv[])
 
 	if (startgo) {
 		/* start directly into GO prompt */
-		Arg a = (Arg)SETPROP("_SURF_URI", "_SURF_GO", PROMPT_GO);
+		Arg a = (Arg)GO("_SURF_URI", "_SURF_GO", PROMPT_GO);
 		spawn(c, &a);
 	}
 
