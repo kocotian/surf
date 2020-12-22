@@ -13,6 +13,8 @@ static char **plugindirs    = (char*[]){
 	NULL
 };
 
+static char *externalpipe_sigusr1[] = {"/bin/sh", "-c", "externalpipe_buffer.sh surf_strings_read"};
+
 static SearchEngine searchengines[] = {
 	/* token,    uri */
 	{ "ddg",       "https://duckduckgo.com/?q=%s" },

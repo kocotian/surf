@@ -25,7 +25,7 @@ index c9fa08d..4d589aa 100644
 @@ -289,6 +290,50 @@ cookiejar_set_property(GObject *self, guint prop_id, const GValue *value,
  	flock(COOKIEJAR(self)->lock, LOCK_UN);
  }
- 
+
 +struct client_size_tuple {
 +	Client* c;
 +	gint s;
@@ -74,7 +74,7 @@ index c9fa08d..4d589aa 100644
  evalscript(JSContextRef js, char *script, char* scriptname) {
  	JSStringRef jsscript, jsscriptname;
 @@ -496,12 +541,105 @@ geturi(Client *c) {
- 
+
  static gboolean
  initdownload(WebKitWebView *view, WebKitDownload *o, Client *c) {
 -	Arg arg;
@@ -175,12 +175,12 @@ index c9fa08d..4d589aa 100644
 +
 +	g_free(path);
 +	g_free(uri);
- 
+
 -	updatewinid(c);
 -	arg = (Arg)DOWNLOAD((char *)webkit_download_get_uri(o), geturi(c));
 -	spawn(c, &arg);
 -	return FALSE;
 +	return TRUE;
  }
- 
+
  static void
